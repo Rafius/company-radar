@@ -1,0 +1,112 @@
+export interface Stock {
+    symbol: string
+    name: string
+    price: number
+    change: number
+    changePercent: number
+    volume: string
+    marketCap: string
+    pe: number
+    trend: number[]
+    targetPrice?: number
+  }
+  
+  export const mockStocks: Stock[] = [
+    {
+      symbol: "AAPL",
+      name: "Apple Inc.",
+      price: 178.45,
+      change: 2.34,
+      changePercent: 1.33,
+      volume: "52.3M",
+      marketCap: "2.8T",
+      pe: 29.5,
+      trend: [170, 172, 168, 175, 173, 176, 178],
+      targetPrice: 180,
+    },
+    {
+      symbol: "MSFT",
+      name: "Microsoft Corporation",
+      price: 412.8,
+      change: -1.2,
+      changePercent: -0.29,
+      volume: "23.1M",
+      marketCap: "3.1T",
+      pe: 35.2,
+      trend: [410, 415, 413, 411, 414, 413, 412],
+      targetPrice: 400,
+    },
+    {
+      symbol: "GOOGL",
+      name: "Alphabet Inc.",
+      price: 142.65,
+      change: 3.45,
+      changePercent: 2.48,
+      volume: "28.7M",
+      marketCap: "1.8T",
+      pe: 26.8,
+      trend: [135, 137, 136, 139, 140, 141, 142],
+      targetPrice: 145,
+    },
+    {
+      symbol: "AMZN",
+      name: "Amazon.com Inc.",
+      price: 178.25,
+      change: 1.85,
+      changePercent: 1.05,
+      volume: "45.2M",
+      marketCap: "1.9T",
+      pe: 68.4,
+      trend: [172, 174, 173, 176, 175, 177, 178],
+      targetPrice: 180,
+    },
+    {
+      symbol: "TSLA",
+      name: "Tesla Inc.",
+      price: 242.84,
+      change: -5.67,
+      changePercent: -2.28,
+      volume: "112.5M",
+      marketCap: "771B",
+      pe: 75.2,
+      trend: [255, 252, 248, 250, 246, 244, 242],
+      targetPrice: 240,
+    },
+    {
+      symbol: "NVDA",
+      name: "NVIDIA Corporation",
+      price: 875.28,
+      change: 12.45,
+      changePercent: 1.44,
+      volume: "38.9M",
+      marketCap: "2.2T",
+      pe: 72.5,
+      trend: [840, 850, 855, 860, 865, 870, 875],
+      targetPrice: 880,
+    },
+    {
+      symbol: "META",
+      name: "Meta Platforms Inc.",
+      price: 485.5,
+      change: 4.2,
+      changePercent: 0.87,
+      volume: "15.8M",
+      marketCap: "1.2T",
+      pe: 28.9,
+      trend: [478, 480, 482, 483, 484, 485, 485],
+      targetPrice: 490,
+    },
+    {
+      symbol: "NFLX",
+      name: "Netflix Inc.",
+      price: 612.3,
+      change: -3.45,
+      changePercent: -0.56,
+      volume: "4.2M",
+      marketCap: "264B",
+      pe: 42.1,
+      trend: [615, 618, 616, 614, 613, 613, 612],
+      targetPrice: 615,
+    },
+  ]
+  
