@@ -1,17 +1,56 @@
-import React from 'react'
-import { TrendingUp, TrendingDown, Target } from "lucide-react"
+import React, { useState } from 'react'
+import { TrendingUp, TrendingDown, Target, RefreshCw, Pencil, Check, X } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
 import { getPriceDifference } from '@/utils/stockUtils'
 import type { Stock } from '@/types'
 
 interface StockRowProps {
   stock: Stock
   index: number
+  onRefresh?: (symbol: string) => Promise<void>
+  onUpdateTargetPrice?: (symbol: string, targetPrice: number | undefined) => Promise<void>
+  isLoading?: boolean
 }
 
-export const StockRow: React.FC<StockRowProps> = ({ stock, index }) => {
+export const StockRow: React.FC<StockRowProps> = ({ 
+  stock, 
+  index, 
+  onRefresh, 
+  onUpdateTargetPrice,
+  isLoading = false 
+}) => {
+  const [isEditingTarget, setIsEditingTarget] = useState(false)
+  const [editValue, setEditValue] = useState<string>(stock.targetPrice?.toFixed(2) || '')
+
   const priceDiff = getPriceDifference(stock.price, stock.targetPrice)
   const isTargetReached = priceDiff !== null && priceDiff <= 0
+
+  const handleRefresh = async (): Promise<void> => {
+    if (onRefresh && !isLoading) {
+      await onRefresh(stock.symbol)
+    }
+  }
+
+  const handleEdit = (): void => {
+    setIsEditingTarget(true)
+    setEditValue(stock.targetPrice?.toFixed(2) || '')
+  }
+
+  const handleSave = async (): Promise<void> => {
+    if (onUpdateTargetPrice) {
+      const value = editValue.trim()
+      const targetPrice = value ? Number.parseFloat(value) : undefined
+      await onUpdateTargetPrice(stock.symbol, targetPrice)
+    }
+    setIsEditingTarget(false)
+  }
+
+  const handleCancel = (): void => {
+    setIsEditingTarget(false)
+    setEditValue(stock.targetPrice?.toFixed(2) || '')
+  }
 
   return (
     <tr
@@ -23,6 +62,18 @@ export const StockRow: React.FC<StockRowProps> = ({ stock, index }) => {
         <div className="flex items-center gap-2">
           <div className="font-bold text-lg">{stock.symbol}</div>
           {isTargetReached && <Target className="w-5 h-5 text-success" aria-label="Target reached" />}
+          {onRefresh && (
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={handleRefresh}
+              disabled={isLoading}
+              className="h-6 w-6 p-0"
+              aria-label={`Refresh ${stock.symbol} price`}
+            >
+              <RefreshCw className={`w-3 h-3 ${isLoading ? 'animate-spin' : ''}`} />
+            </Button>
+          )}
         </div>
       </td>
       <td className="p-4 hidden md:table-cell">
@@ -32,10 +83,59 @@ export const StockRow: React.FC<StockRowProps> = ({ stock, index }) => {
         <div className="font-semibold text-lg">${stock.price.toFixed(2)}</div>
       </td>
       <td className="p-4 text-right">
-        {stock.targetPrice ? (
-          <div className="font-medium text-lg">${stock.targetPrice.toFixed(2)}</div>
+        {isEditingTarget ? (
+          <div className="flex items-center justify-end gap-2">
+            <Input
+              type="number"
+              value={editValue}
+              onChange={(e) => setEditValue(e.target.value)}
+              className="w-24 text-right"
+              step="0.01"
+              placeholder="0.00"
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') handleSave()
+                if (e.key === 'Escape') handleCancel()
+              }}
+              autoFocus
+            />
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={handleSave}
+              className="h-6 w-6 p-0"
+              aria-label="Save"
+            >
+              <Check className="w-3 h-3" />
+            </Button>
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={handleCancel}
+              className="h-6 w-6 p-0"
+              aria-label="Cancel"
+            >
+              <X className="w-3 h-3" />
+            </Button>
+          </div>
         ) : (
-          <div className="text-sm text-muted-foreground">-</div>
+          <div className="flex items-center justify-end gap-2">
+            {stock.targetPrice ? (
+              <div className="font-medium text-lg">${stock.targetPrice.toFixed(2)}</div>
+            ) : (
+              <div className="text-sm text-muted-foreground">-</div>
+            )}
+            {onUpdateTargetPrice && (
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={handleEdit}
+                className="h-6 w-6 p-0"
+                aria-label="Edit target price"
+              >
+                <Pencil className="w-3 h-3" />
+              </Button>
+            )}
+          </div>
         )}
       </td>
       <td className="p-4 text-right">

@@ -5,7 +5,7 @@ import { useStocks } from '@/hooks/useStocks'
 import { useSorting } from '@/hooks/useSorting'
 
 export const App: React.FC = () => {
-  const { stocks, addStock } = useStocks()
+  const { stocks, addStock, refreshStock, refreshAllStocks, updateTargetPrice, isLoading, error } = useStocks()
   const { sortConfig, handleSort } = useSorting()
 
   return (
@@ -18,12 +18,20 @@ export const App: React.FC = () => {
           </p>
         </header>
 
-        <StockForm onAddStock={addStock} />
+        <StockForm 
+          onAddStock={addStock}
+          onRefreshAll={refreshAllStocks}
+          isLoading={isLoading}
+          error={error}
+        />
         
         <StockTable 
           stocks={stocks} 
           sortConfig={sortConfig} 
-          onSort={handleSort} 
+          onSort={handleSort}
+          onRefreshStock={refreshStock}
+          onUpdateTargetPrice={updateTargetPrice}
+          isLoading={isLoading}
         />
       </div>
     </main>

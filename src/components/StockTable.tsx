@@ -9,9 +9,19 @@ interface StockTableProps {
   stocks: Stock[]
   sortConfig: SortConfig
   onSort: (field: SortField) => void
+  onRefreshStock?: (symbol: string) => Promise<void>
+  onUpdateTargetPrice?: (symbol: string, targetPrice: number | undefined) => Promise<void>
+  isLoading?: boolean
 }
 
-export const StockTable: React.FC<StockTableProps> = ({ stocks, sortConfig, onSort }) => {
+export const StockTable: React.FC<StockTableProps> = ({ 
+  stocks, 
+  sortConfig, 
+  onSort, 
+  onRefreshStock,
+  onUpdateTargetPrice,
+  isLoading = false 
+}) => {
   const sortedStocks = sortStocks(stocks, sortConfig)
 
   return (
@@ -114,7 +124,14 @@ export const StockTable: React.FC<StockTableProps> = ({ stocks, sortConfig, onSo
             </thead>
             <tbody>
               {sortedStocks.map((stock, index) => (
-                <StockRow key={stock.symbol} stock={stock} index={index} />
+                <StockRow 
+                  key={stock.symbol} 
+                  stock={stock} 
+                  index={index}
+                  onRefresh={onRefreshStock}
+                  onUpdateTargetPrice={onUpdateTargetPrice}
+                  isLoading={isLoading}
+                />
               ))}
             </tbody>
           </table>
