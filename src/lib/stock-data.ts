@@ -1,17 +1,4 @@
-export interface Stock {
-    symbol: string
-    name: string
-    price: number
-    change: number
-    changePercent: number
-    volume: string
-    marketCap: string
-    pe: number
-    trend: number[]
-    targetPrice?: number
-  }
-  
-  export const mockStocks: Stock[] = [
+export const mockStocks = [
     {
       symbol: "AAPL",
       name: "Apple Inc.",
@@ -108,5 +95,5 @@ export interface Stock {
       trend: [615, 618, 616, 614, 613, 613, 612],
       targetPrice: 615,
     },
-  ]
+  ] as const
   
