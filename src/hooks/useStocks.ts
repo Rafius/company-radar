@@ -19,12 +19,48 @@ interface UseStocksReturn {
 }
 
 const CACHE_DURATION = 10 * 60 * 1000 // 10 minutes in milliseconds
+const TARGET_PRICES_KEY = 'stock-target-prices'
 const stockCache = new Map<string, CacheEntry>()
 
+const getTargetPricesFromStorage = (): Record<string, number> => {
+  try {
+    const stored = localStorage.getItem(TARGET_PRICES_KEY)
+    return stored ? JSON.parse(stored) : {}
+  } catch {
+    return {}
+  }
+}
+
+const saveTargetPricesToStorage = (targetPrices: Record<string, number>): void => {
+  try {
+    localStorage.setItem(TARGET_PRICES_KEY, JSON.stringify(targetPrices))
+  } catch (error) {
+    console.warn('Failed to save target prices to localStorage:', error)
+  }
+}
+
 export const useStocks = (): UseStocksReturn => {
-  const [stocks, setStocks] = useState<Stock[]>([...mockStocks] as unknown as Stock[])
+  const [stocks, setStocks] = useState<Stock[]>([])
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [error, setError] = useState<ApiError | null>(null)
+
+  const applyTargetPricesFromStorage = useCallback((stockList: Stock[]): Stock[] => {
+    const storedTargetPrices = getTargetPricesFromStorage()
+    return stockList.map(stock => ({
+      ...stock,
+      targetPrice: storedTargetPrices[stock.symbol] || stock.targetPrice
+    }))
+  }, [])
+
+  const saveTargetPriceToStorage = useCallback((symbol: string, targetPrice: number | undefined): void => {
+    const stored = getTargetPricesFromStorage()
+    if (targetPrice !== undefined) {
+      stored[symbol] = targetPrice
+    } else {
+      delete stored[symbol]
+    }
+    saveTargetPricesToStorage(stored)
+  }, [])
 
   const isCacheValid = useCallback((symbol: string): boolean => {
     const cached = stockCache.get(symbol)
@@ -87,7 +123,10 @@ export const useStocks = (): UseStocksReturn => {
     setError(null)
 
     try {
-      const refreshPromises = stocks.map(async (stock) => {
+      // Initialize with mock stocks and apply target prices from storage
+      const initialStocks = applyTargetPricesFromStorage([...mockStocks] as unknown as Stock[])
+      
+      const refreshPromises = initialStocks.map(async (stock) => {
         const cached = getCachedStock(stock.symbol)
         if (cached && isCacheValid(stock.symbol)) {
           return { ...cached, targetPrice: stock.targetPrice }
@@ -102,7 +141,7 @@ export const useStocks = (): UseStocksReturn => {
     } finally {
       setIsLoading(false)
     }
-  }, [stocks, getCachedStock, isCacheValid, fetchStockData])
+  }, [getCachedStock, isCacheValid, fetchStockData, applyTargetPricesFromStorage])
 
   useEffect(() => {
     loadAllStocks()
@@ -128,7 +167,12 @@ export const useStocks = (): UseStocksReturn => {
         trend: [0, 0, 0, 0, 0, 0, 0],
         targetPrice: formData.targetPrice ? Number.parseFloat(formData.targetPrice) : undefined,
       })
-      newStock.targetPrice = formData.targetPrice ? Number.parseFloat(formData.targetPrice) : undefined
+      
+      const targetPrice = formData.targetPrice ? Number.parseFloat(formData.targetPrice) : undefined
+      newStock.targetPrice = targetPrice
+      
+      // Save target price to localStorage
+      saveTargetPriceToStorage(newStock.symbol, targetPrice)
       
       setStocks(prevStocks => {
         // Check if stock already exists
@@ -147,7 +191,7 @@ export const useStocks = (): UseStocksReturn => {
     } finally {
       setIsLoading(false)
     }
-  }, [fetchStockData])
+  }, [fetchStockData, saveTargetPriceToStorage])
 
   const refreshStock = useCallback(async (symbol: string): Promise<void> => {
     setIsLoading(true)
@@ -196,6 +240,9 @@ export const useStocks = (): UseStocksReturn => {
   }, [stocks, fetchStockData])
 
   const updateTargetPrice = useCallback(async (symbol: string, targetPrice: number | undefined): Promise<void> => {
+    // Save to localStorage
+    saveTargetPriceToStorage(symbol, targetPrice)
+    
     setStocks(prevStocks => 
       prevStocks.map(s => 
         s.symbol === symbol 
@@ -203,7 +250,7 @@ export const useStocks = (): UseStocksReturn => {
           : s
       )
     )
-  }, [])
+  }, [saveTargetPriceToStorage])
 
   return {
     stocks,
