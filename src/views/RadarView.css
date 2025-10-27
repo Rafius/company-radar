@@ -1,0 +1,123 @@
+.radar-view {
+  width: 100%;
+}
+
+.view-header {
+  margin-bottom: 2rem;
+}
+
+.view-header h2 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+}
+
+.view-header p {
+  color: var(--text-secondary);
+  font-size: 1rem;
+}
+
+.radar-container {
+  background: var(--bg-secondary);
+  border-radius: 12px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  border: 1px solid var(--border-color);
+}
+
+.radar-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 1.5rem;
+}
+
+.radar-card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 1.5rem;
+  transition: all 0.3s ease;
+}
+
+.radar-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
+  border-color: var(--primary-color);
+}
+
+.radar-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1.25rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.radar-card-header h3 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--primary-color);
+  margin-bottom: 0.25rem;
+}
+
+.company-name {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.score-badge {
+  padding: 0.5rem 0.75rem;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: white;
+  min-width: 50px;
+  text-align: center;
+}
+
+.radar-card-metrics {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.metric-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.9rem;
+}
+
+.metric-row span {
+  color: var(--text-secondary);
+}
+
+.metric-row strong {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.target-price {
+  color: var(--primary-color) !important;
+}
+
+.positive {
+  color: var(--success-color) !important;
+}
+
+.negative {
+  color: var(--danger-color) !important;
+}
+
+@media (max-width: 768px) {
+  .radar-container {
+    padding: 1rem;
+  }
+
+  .radar-cards {
+    grid-template-columns: 1fr;
+  }
+}
+
